@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 const navItems = [
   { href: '/', label: 'Physics Simulation', icon: '⚛️' },
   { href: '/solar-system', label: 'Solar System', icon: '🪐' },
+  { href: '/galaxy', label: 'Galaxy', icon: '🌌' },
 ];
 
 export default function Navbar() {
