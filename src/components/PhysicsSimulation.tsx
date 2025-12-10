@@ -5,6 +5,7 @@ import { OrbitControls, Box, Sphere } from '@react-three/drei';
 import { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import Navbar from './Navbar';
 
 // Bouncing Ball Component with Physics
 function BouncingBall({ 
@@ -140,14 +141,8 @@ export default function PhysicsSimulation() {
 
   return (
     <div className="w-full h-screen bg-black">
-      {/* Top Info Bar */}
-      <div className="absolute top-0 left-0 right-0 z-10 bg-black/50 backdrop-blur-sm border-b border-white/10">
-        <div className="px-6 py-3">
-          <h1 className="text-xl font-light text-white">
-            webgl / physics simulation
-          </h1>
-        </div>
-      </div>
+      {/* Navbar */}
+      <Navbar />
       
       {/* Three.js Canvas */}
       <Canvas
