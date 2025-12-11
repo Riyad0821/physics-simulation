@@ -36,13 +36,13 @@ export default function OrbitLine({
   }, [points]);
 
   return (
-    <line geometry={lineGeometry}>
+    <lineLoop geometry={lineGeometry}>
       <lineBasicMaterial
         color={color}
         transparent
         opacity={opacity}
         linewidth={1}
       />
-    </line>
+    </lineLoop>
   );
 }

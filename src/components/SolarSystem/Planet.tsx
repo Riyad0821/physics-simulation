@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, Suspense } from 'react';
-import { useFrame, useLoader } from '@react-three/fiber';
+import { useFrame, useLoader, ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
 import { PlanetConfig } from './planetData';
 import Moon from './Moon';
@@ -51,7 +51,7 @@ export default function Planet({ config, onClick, isSelected, animationSpeed = 1
     }
   });
 
-  const handleClick = (e: THREE.Event) => {
+  const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
     if (onClick) {
       onClick(config);

@@ -52,21 +52,15 @@ export default function Starfield({ count = 5000, radius = 500 }: StarfieldProps
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
-          count={count}
-          array={positions.positions}
-          itemSize={3}
+          args={[positions.positions, 3]}
         />
         <bufferAttribute
           attach="attributes-color"
-          count={count}
-          array={positions.colors}
-          itemSize={3}
+          args={[positions.colors, 3]}
         />
         <bufferAttribute
           attach="attributes-size"
-          count={count}
-          array={sizes}
-          itemSize={1}
+          args={[sizes, 1]}
         />
       </bufferGeometry>
       <pointsMaterial
