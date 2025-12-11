@@ -12,6 +12,8 @@ import { GALAXY_CONFIG } from '@/config/galaxy.config';
 import { useGalaxyStore } from '@/stores/galaxyStore';
 import { useUIStore } from '@/stores/uiStore';
 import UIOverlay from '../ui/UIOverlay';
+import { CockpitHUD } from '../ui/CockpitHUD';
+import { StarSelector } from '../ui/StarSelector';
 import { StarSystemManager } from '../systems/StarSystemManager';
 
 // Placeholder for StarSystemManager (will be implemented next)
@@ -119,6 +121,8 @@ export default function GalaxyScene() {
         dpr={[1, 2]} // Cap at 2 for performance
       >
         <GalaxySceneContent />
+        <StarSelector />
+        <CockpitHUD />
         {showStats && <Stats />}
       </Canvas>
       
