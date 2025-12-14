@@ -2,8 +2,7 @@
 // Uses a simple noise function to simulate convection cells
 
 uniform float time;
-uniform vec3 color;
-varying vec2 vUv;
+varying vec3 vColor;
 
 // Simplex 2D noise
 vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
@@ -34,7 +33,11 @@ float snoise(vec2 v){
 }
 
 void main() {
-    float n = snoise(vUv * 10.0 + time * 0.5);
-    vec3 result = color * (0.8 + 0.4 * n);
+    // Circle shape for point
+    vec2 coord = gl_PointCoord - vec2(0.5);
+    if(length(coord) > 0.5) discard;
+
+    float n = snoise(gl_PointCoord * 10.0 + time * 0.5);
+    vec3 result = vColor * (0.8 + 0.4 * n);
     gl_FragColor = vec4(result, 1.0);
 }

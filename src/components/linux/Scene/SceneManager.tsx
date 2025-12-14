@@ -6,6 +6,9 @@ import * as THREE from 'three';
 import { CPU } from '../Hardware/CPU';
 import { Memory } from '../Hardware/Memory';
 import { Storage } from '../Hardware/Storage';
+import { InputDevice } from '../Hardware/InputDevice';
+import { OutputDevice } from '../Hardware/OutputDevice';
+import { DataBus } from '../DataFlow/DataBus';
 
 export function SceneManager() {
   const groupRef = useRef<THREE.Group>(null);
@@ -28,6 +31,13 @@ export function SceneManager() {
       <CPU position={[0, 0.2, 0]} />
       <Memory position={[6, 0.2, 0]} />
       <Storage position={[-6, 0.2, 0]} />
+      
+      {/* I/O Devices */}
+      <InputDevice position={[-6, 0.2, 4]} />
+      <OutputDevice position={[6, 0.2, 4]} />
+      
+      {/* Data Bus System */}
+      <DataBus />
     </group>
   );
 }

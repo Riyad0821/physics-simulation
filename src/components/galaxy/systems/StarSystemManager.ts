@@ -2,30 +2,66 @@ import * as THREE from 'three';
 import { StarFactory } from '../stellar/StarFactory';
 import { GALAXY_CONFIG } from '@/config/galaxy.config';
 import { TextureGenerator } from '../rendering/TextureGenerator';
+import { ImpostorManager } from '../rendering/lod/ImpostorManager';
+import { useGalaxyStore } from '@/stores/galaxyStore';
+import starVertexShader from '@/shaders/library/stellar/star_vertex.glsl';
+import starFragmentShader from '@/shaders/library/stellar/star_surface.glsl';
 
 export class StarSystemManager {
   private factory: StarFactory;
   private scene: THREE.Scene;
   private starPoints: THREE.Points | null = null;
   private geometry: THREE.BufferGeometry;
-  private material: THREE.PointsMaterial;
+  private material: THREE.ShaderMaterial;
+  private impostorManager: ImpostorManager;
+  private unsubQuality: (() => void) | null = null;
 
   constructor(scene: THREE.Scene) {
     this.scene = scene;
     this.factory = new StarFactory();
     this.geometry = new THREE.BufferGeometry();
     
-    const texture = TextureGenerator.generateStarSprite();
+    // Initialize Impostor Manager
+    this.impostorManager = new ImpostorManager();
     
-    this.material = new THREE.PointsMaterial({
-        size: 200, // Scaled size
-        map: texture,
-        vertexColors: true,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false, // Important for transparency overlap
+    // Custom Shader Material for Stars
+    this.material = new THREE.ShaderMaterial({
+        uniforms: {
+            time: { value: 0 },
+            size: { value: 100.0 }, // Adjusted for shader
+            scale: { value: 500.0 } // Approximate scale factor for attenuation
+        },
+        vertexShader: starVertexShader,
+        fragmentShader: starFragmentShader,
         transparent: true,
-        sizeAttenuation: true
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        vertexColors: true
     });
+    
+    this.setupQualityListener();
+  }
+
+  setupQualityListener() {
+    this.unsubQuality = useGalaxyStore.subscribe((state) => {
+        this.updateQuality(state.qualityPreset);
+    });
+    // Initial set
+    this.updateQuality(useGalaxyStore.getState().qualityPreset);
+  }
+
+  updateQuality(preset: string) {
+    if (!this.geometry.getAttribute('position')) return;
+    
+    const count = this.geometry.getAttribute('position').count;
+    let limit = count;
+    switch(preset) {
+        case 'low': limit = Math.floor(count * 0.25); break;
+        case 'medium': limit = Math.floor(count * 0.5); break;
+        case 'high': limit = Math.floor(count * 0.8); break;
+        case 'ultra': limit = count; break;
+    }
+    this.geometry.setDrawRange(0, limit);
   }
 
   generateGalaxy() {
@@ -74,14 +110,33 @@ export class StarSystemManager {
     this.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     
     this.starPoints = new THREE.Points(this.geometry, this.material);
+    this.starPoints.userData = { isStarSystem: true }; // Marker for raycasting
     this.scene.add(this.starPoints);
-    console.log(`Generated ${count} stars (Points).`);
+    
+    // Generate Impostors for LOD
+    this.impostorManager.generateImpostors(positions, colors);
+    this.scene.add(this.impostorManager.getMesh());
+    
+    console.log(`Generated ${count} stars (Points) and impostors.`);
   }
 
-  update(delta: number, time: number) {
+  update(delta: number, time: number, camera?: THREE.Camera) {
+    // Update Shader Uniforms
+    if (this.material) {
+        this.material.uniforms.time.value = time;
+    }
+
     if (this.starPoints) {
         this.starPoints.rotation.y += 0.02 * delta;
+        // Apply same rotation to impostors to keep them synced
+        const impostors = this.impostorManager.getMesh();
+        impostors.rotation.y = this.starPoints.rotation.y;
     }
+    
+    // Basic LOD Logic: Switch based on distance or density
+    // For now, simpler: Use impostors for really distant views?
+    // Actually, impostors are usually for background clouds or huge clusters.
+    // Let's keep both active for now but maybe fade them?
   }
   
   // Method to get star data near a point (for Raycasting/HUD)
@@ -97,5 +152,8 @@ export class StarSystemManager {
         this.material.dispose();
         this.starPoints = null;
     }
+    this.scene.remove(this.impostorManager.getMesh());
+    this.impostorManager.dispose();
+    if (this.unsubQuality) this.unsubQuality();
   }
 }

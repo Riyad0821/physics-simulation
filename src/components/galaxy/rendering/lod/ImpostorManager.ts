@@ -56,4 +56,9 @@ export class ImpostorManager {
   getMesh() {
     return this.points;
   }
+
+  dispose() {
+    this.geometry.dispose();
+    this.material.dispose();
+  }
 }
