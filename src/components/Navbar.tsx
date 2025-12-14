@@ -8,6 +8,7 @@ const navItems = [
   { href: '/solar-system', label: 'Solar System', icon: '🪐' },
   { href: '/galaxy', label: 'Galaxy', icon: '🌌' },
   { href: '/realistic-galaxy', label: 'Realistic Galaxy', icon: '✨' },
+  { href: '/fps-game', label: 'FPS Game', icon: '🔫' },
   { href: '/linux-simulation', label: 'Linux Simulator', icon: '🐧' },
 ];
 
